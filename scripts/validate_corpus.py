@@ -28,6 +28,10 @@ REQUIRES_RECEIPTS = {"VERIFIED", "MISATTRIBUTED"}
 ID_RE = re.compile(r"^q-[a-z0-9][a-z0-9-]*[a-z0-9]$")
 SOURCE_TYPES = {"film", "book", "speech", "paper", "article", "letter", "interview", "other"}
 HUMMBL_TAGS = {"P", "IN", "CO", "DE", "RE", "SY"}
+OPINION_CLASSES = {
+    "AXIOLOGICAL", "AESTHETIC", "CONJECTURAL", "HEURISTIC", "HERMENEUTIC",
+    "AXIO", "AESTH", "CONJ", "HEUR", "HERM",
+}
 
 
 def load_entries(path):
@@ -104,6 +108,36 @@ def validate_entry(lineno, e):
     if not e.get("context"):
         warns.append(f"line {lineno} ({eid}): no context — canon entries should say why the line lands")
 
+    if "opinion" in e:
+        op = e["opinion"]
+        if not isinstance(op, dict):
+            errs.append(f"line {lineno} ({eid}): opinion must be an object")
+        else:
+            cls = op.get("class")
+            if not isinstance(cls, str) or cls.strip().upper() not in OPINION_CLASSES:
+                errs.append(f"line {lineno} ({eid}): opinion.class '{cls}' invalid (want one of {sorted(OPINION_CLASSES)})")
+
+            holder = op.get("holder")
+            if isinstance(holder, dict):
+                holder_name = holder.get("identity") or holder.get("name")
+            else:
+                holder_name = holder
+            if not isinstance(holder_name, str) or not holder_name.strip():
+                errs.append(f"line {lineno} ({eid}): opinion missing valid 'holder' identity")
+
+            loss = op.get("loss_function") or op.get("evaluative_basis")
+            if not isinstance(loss, str) or not loss.strip():
+                errs.append(f"line {lineno} ({eid}): opinion missing 'loss_function' or 'evaluative_basis'")
+
+            triggers = op.get("update_triggers") or op.get("falsification_conditions")
+            if not isinstance(triggers, list) or not triggers or not any(isinstance(t, str) and t.strip() for t in triggers):
+                errs.append(f"line {lineno} ({eid}): opinion requires non-empty 'update_triggers'")
+
+            if "intensity" in op:
+                intensity = op["intensity"]
+                if not isinstance(intensity, (int, float)) or not (0.0 <= intensity <= 1.0):
+                    errs.append(f"line {lineno} ({eid}): opinion.intensity must be a float between 0.0 and 1.0")
+
     return errs, warns
 
 
@@ -126,9 +160,12 @@ def main():
 
     prov_counts = Counter(e.get("provenance", "?") for _, e in entries)
     theme_counts = Counter(t for _, e in entries for t in e.get("themes", []))
+    opinion_count = sum(1 for _, e in entries if "opinion" in e)
 
     print(f"entries: {len(entries)}")
     print("provenance: " + ", ".join(f"{k}={v}" for k, v in sorted(prov_counts.items())))
+    if opinion_count:
+        print(f"opinions: {opinion_count} ({opinion_count / len(entries) * 100:.1f}% of corpus)")
     if theme_counts:
         top = ", ".join(f"{k}({v})" for k, v in theme_counts.most_common(8))
         print(f"top themes: {top}")
