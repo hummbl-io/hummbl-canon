@@ -1,0 +1,13 @@
+# Personal resonance logs stay local
+resonance/*.jsonl
+
+# Python
+__pycache__/
+*.pyc
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node (if tooling is added later)
+node_modules/
