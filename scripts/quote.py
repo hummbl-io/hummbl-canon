@@ -41,6 +41,14 @@ def fmt(e, cite=False):
     parts.append(f'  source:   {src.get("work", "?")} — {src.get("locator", "?")}')
     if e.get("context"):
         parts.append(f'  context:  {e["context"]}')
+    if e.get("opinion"):
+        op = e["opinion"]
+        cls = op.get("class", "?")
+        holder = op.get("holder", "?")
+        if isinstance(holder, dict):
+            holder = holder.get("identity") or holder.get("name") or "?"
+        loss = op.get("loss_function") or op.get("evaluative_basis") or ""
+        parts.append(f'  opinion:  [{cls}] holder={holder} loss="{loss}"')
     return "\n".join(parts)
 
 

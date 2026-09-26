@@ -21,13 +21,24 @@ One JSON object per line in `corpus/quotes.jsonl`.
 | `themes` | string[] | Freeform tags (e.g. `hubris`, `systems`, `responsibility`) |
 | `hummbl` | string[] | Base120 transformation tags (`P`,`IN`,`CO`,`DE`,`RE`,`SY`) |
 | `receipts` | object[] | `{type, ref}` — evidence links/citations. **Required non-empty for `VERIFIED` and `MISATTRIBUTED`** |
+| `opinion` | object | `{class, holder, loss_function, update_triggers, intensity}` — HOG-1 evaluative stance (see below) |
 | `notes` | string | Anything else load-bearing |
 
 ## `source` object
 
-- `type`: `film` \| `book` \| `speech` \| `paper` \| `article` \| `letter` \| `interview` \| `other`
+- `type`: `film` | `book` | `speech` | `paper` | `article` | `letter` | `interview` | `other`
 - `work`: the containing work (title, year)
 - `locator`: where in the work (scene, chapter, page, timestamp, citation)
+
+## `opinion` object (HOG-1 Evaluative Governance)
+
+The optional `opinion` block attaches structured evaluative, aesthetic, or heuristic judgment to a quote without mutating its Layer-0 factual provenance. Codified per `hummbl-io/agents` `rules/opinion-governance.md` (HOG-1):
+
+- `class`: one of `AXIOLOGICAL` | `AESTHETIC` | `CONJECTURAL` | `HEURISTIC` | `HERMENEUTIC` (or short tags `AXIO`, `AESTH`, `CONJ`, `HEUR`, `HERM`)
+- `holder`: identity or perspective of the evaluator (e.g. `agy`, `reuben`, `film-consensus`). Perspective disclosure is mandatory.
+- `loss_function`: the explicit rubric, evaluative basis, or metric optimized by this stance (e.g. `"Synthetic existential resonance * Somber pathos"`).
+- `update_triggers`: array of falsification criteria or conditions under which this evaluation revises. Dogmatic stances without update triggers fail validation.
+- `intensity`: optional float (0.0 to 1.0) indicating subjective conviction or resonance strength.
 
 ## Provenance ladder
 
