@@ -35,3 +35,34 @@ One JSON object per line in `corpus/quotes.jsonl`.
 - `COMMON-ATTRIB` — plausible traditional attribution without conclusive evidence (e.g., ancient quotes relayed by later authors)
 - `MISATTRIBUTED` — the popular attribution is demonstrably wrong; `verified_attribution` names the actual origin
 - `UNVERIFIED` — claimed but not yet checked (valid state; an entry may live here until receipts arrive)
+
+---
+
+# Resonance entry schema
+
+One JSON object per line in `resonance/*.jsonl` (gitignored — local-first by design).
+
+The resonance log answers a different question than the corpus: not "who really said this" but "when did this line land for the reader, and why." Entries are never published to the shared corpus.
+
+## Required fields
+
+| Field | Type | Notes |
+|---|---|---|
+| `ts` | string | ISO-8601 timestamp of the capture moment (`2026-09-26T08:15:00Z`) |
+| anchor | — | exactly one of `quote_id` (corpus id; must resolve) **or** `text` (uncaptured line) |
+
+## Optional fields
+
+| Field | Type | Notes |
+|---|---|---|
+| `surface` | string | Where it came from — video, book, conversation, PR review |
+| `note` | string | Why it landed *then* — the point of the record |
+| `themes` | string[] | Freeform tags; over time this indexes the reader's own canon |
+
+## Anchor rule
+
+- `quote_id` **must** resolve to an id in `corpus/quotes.jsonl` — a dangling anchor is a validation error, not a soft reference
+- `text` is the escape hatch for lines that hit before they're captured in the corpus; those entries are candidates for later corpus ingestion
+- Never both fields on one entry — pick one anchor form
+
+Validated by `scripts/validate_resonance.py` (local only; the files are gitignored).

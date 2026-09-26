@@ -17,6 +17,9 @@
 ```bash
 python scripts/validate_corpus.py            # validate corpus
 python scripts/validate_corpus.py --stats    # stats
+python scripts/quote.py --list               # all anchors
+python scripts/quote.py <q-id>               # resolve one
+python scripts/validate_resonance.py         # validate local resonance logs (files gitignored)
 ```
 
 ## Conventions
