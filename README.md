@@ -17,6 +17,11 @@ Most quote collections are wrong about who said what. Canon treats attribution a
 ```bash
 python scripts/validate_corpus.py            # validate corpus/quotes.jsonl
 python scripts/validate_corpus.py --stats    # corpus statistics
+python scripts/quote.py q-gall-simple-system            # resolve an anchor
+python scripts/quote.py --cite q-feynman-fool-yourself  # citation form
+python scripts/quote.py --theme hubris                  # browse by theme
+python scripts/quote.py --search "slave of the passions"
+python scripts/validate_resonance.py           # validate local resonance logs
 ```
 
 No dependencies beyond Python 3.11 stdlib.
