@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HUMMBL Canon — Provenance-First Quotation Corpus</title>
+  <meta name="description" content="A provenance-first corpus of quotable lines carrying real cognitive load, attribution evidence, and receipts at canon.hummbl.dev">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2312633c'/><text x='50' y='65' font-size='32' font-family='monospace' font-weight='bold' fill='%23ffffff' text-anchor='middle'>CANON</text></svg>">
+  <style>
+    :root {
+      --grove: #12633c;
+      --verderer: #1b7a3d;
+      --light-green: #eaf5ee;
+      --bg: #0b0f17;
+      --card-bg: #111827;
+      --card-border: #1f2937;
+      --text: #f3f4f6;
+      --text-muted: #9ca3af;
+      --accent: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --code-bg: #030712;
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      line-height: 1.6;
+      padding-bottom: 60px;
+    }
+    header {
+      background: linear-gradient(180deg, rgba(18, 99, 60, 0.4) 0%, rgba(11, 15, 23, 0) 100%);
+      border-bottom: 1px solid var(--card-border);
+      padding: 32px 24px;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 16px;
+    }
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .title-group h1 {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #fff;
+    }
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 600;
+      font-family: var(--font-mono);
+      background: var(--grove);
+      color: #fff;
+      border: 1px solid var(--accent);
+    }
+    .subhead {
+      color: var(--text-muted);
+      font-size: 15px;
+      margin-top: 6px;
+    }
+    .meta-bar {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .stat-pill {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-family: var(--font-mono);
+    }
+    .stat-pill span {
+      color: var(--accent);
+      font-weight: bold;
+    }
+    nav.tabs {
+      display: flex;
+      gap: 8px;
+      margin: 24px 0 32px;
+      border-bottom: 1px solid var(--card-border);
+      overflow-x: auto;
+      padding-bottom: 8px;
+    }
+    .tab-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      font-size: 14px;
+      font-weight: 600;
+      padding: 8px 18px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tab-btn:hover {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.05);
+    }
+    .tab-btn.active {
+      background: var(--grove);
+      color: #fff;
+      border-color: var(--verderer);
+    }
+    .tab-pane {
+      display: none;
+    }
+    .tab-pane.active {
+      display: block;
+    }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    .card h2 {
+      font-size: 20px;
+      margin-bottom: 16px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .hero-banner {
+      background: linear-gradient(135deg, rgba(18, 99, 60, 0.25) 0%, rgba(17, 24, 39, 0.8) 100%);
+      border: 1px solid var(--verderer);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    .hero-banner p.thesis {
+      font-size: 16px;
+      font-weight: 500;
+      color: #e5e7eb;
+      font-style: italic;
+      border-left: 4px solid var(--accent);
+      padding-left: 16px;
+      margin: 12px 0;
+    }
+    .filter-bar {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+      align-items: center;
+    }
+    .filter-bar input[type="text"] {
+      flex: 1;
+      min-width: 250px;
+      background: var(--code-bg);
+      border: 1px solid var(--card-border);
+      color: #fff;
+      padding: 10px 14px;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    .filter-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      cursor: pointer;
+      font-family: var(--font-mono);
+      transition: all 0.2s;
+    }
+    .filter-btn.active {
+      background: var(--grove);
+      color: #fff;
+      border-color: var(--accent);
+    }
+    /* Quotes Grid */
+    .quotes-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+    .quote-card {
+      background: rgba(3, 7, 18, 0.6);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 24px;
+      transition: border-color 0.2s;
+    }
+    .quote-card:hover {
+      border-color: var(--verderer);
+    }
+    .quote-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .quote-id {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--accent);
+      font-weight: bold;
+    }
+    .prov-badge {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+    .prov-verified { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid var(--accent); }
+    .prov-misattributed { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid var(--danger); }
+    .prov-common { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid var(--warning); }
+    .quote-text {
+      font-size: 18px;
+      font-weight: 500;
+      color: #fff;
+      line-height: 1.5;
+      margin-bottom: 16px;
+      font-style: italic;
+    }
+    .attrib-block {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 12px;
+      background: rgba(17, 24, 39, 0.6);
+      padding: 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+    .attrib-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+    .tag-list {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .tag {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+    }
+    .receipts-box {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      font-family: var(--font-mono);
+    }
+    /* Citation Generator */
+    .cite-form {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    select {
+      background: var(--code-bg);
+      border: 1px solid var(--card-border);
+      color: #fff;
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 14px;
+      width: 100%;
+    }
+    .result-box {
+      background: var(--code-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 20px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      white-space: pre-wrap;
+      overflow-x: auto;
+    }
+    footer {
+      margin-top: 48px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 13px;
+      border-top: 1px solid var(--card-border);
+      padding-top: 24px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container header-content">
+      <div class="title-group">
+        <h1>
+          <span>HUMMBL CANON</span>
+          <span class="badge">canon.hummbl.dev</span>
+        </h1>
+        <p class="subhead">Provenance-First Quotation Corpus &bull; Verified Attribution &bull; Personal Resonance Layer</p>
+      </div>
+      <div class="meta-bar">
+        <div class="stat-pill">Corpus: <span>22 Lines</span></div>
+        <div class="stat-pill">Verified: <span>15</span></div>
+        <div class="stat-pill">Misattributed: <span>5</span></div>
+        <div class="stat-pill">Cost Floor: <span>$0 Marginal</span></div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="tabs">
+      <button class="tab-btn active" onclick="openTab(event, 'tab-corpus')">Canon Corpus Explorer</button>
+      <button class="tab-btn" onclick="openTab(event, 'tab-cite')">Citation Generator</button>
+      <button class="tab-btn" onclick="openTab(event, 'tab-themes')">Themes &amp; Epistemics</button>
+      <button class="tab-btn" onclick="openTab(event, 'tab-resonance')">Resonance Protocol</button>
+      <button class="tab-btn" onclick="openTab(event, 'tab-api')">JSON CDN Endpoints</button>
+    </nav>
+
+    <!-- Tab 1: Corpus Explorer -->
+    <div id="tab-corpus" class="tab-pane active">
+      <div class="hero-banner">
+        <h2>Provenance-First Epistemic Substrate</h2>
+        <p class="thesis">
+          "Most quote collections are wrong about who said what. Canon treats attribution as a claim that carries receipts or doesn't. Every entry separates claimed attribution from verified attribution."
+        </p>
+      </div>
+
+      <div class="filter-bar">
+        <input type="text" id="quote-search" placeholder="Search quotes, attribution, themes..." oninput="filterQuotes()">
+        <button class="filter-btn active" onclick="setProvenanceFilter('ALL', event)">ALL (22)</button>
+        <button class="filter-btn" onclick="setProvenanceFilter('VERIFIED', event)">VERIFIED (15)</button>
+        <button class="filter-btn" onclick="setProvenanceFilter('MISATTRIBUTED', event)">MISATTRIBUTED (5)</button>
+        <button class="filter-btn" onclick="setProvenanceFilter('COMMON-ATTRIB', event)">COMMON-ATTRIB (2)</button>
+      </div>
+
+      <div class="quotes-grid" id="quotes-container"></div>
+    </div>
+
+    <!-- Tab 2: Citation Generator -->
+    <div id="tab-cite" class="tab-pane">
+      <div class="card">
+        <h2>AAR &amp; Brief Citation Generator</h2>
+        <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px;">
+          Agents cite <code>q-*</code> IDs in AARs, morning briefs, and architectural reviews with verified provenance receipts.
+        </p>
+
+        <div class="cite-form">
+          <div>
+            <label style="font-size: 14px; font-weight: 600; display: block; margin-bottom: 8px;">Select Quote Anchor ID:</label>
+            <select id="cite-select" onchange="generateCitation()">
+              <option value="q-otto-octavius-intelligence">q-otto-octavius-intelligence — Dr. Otto Octavius (Alfred Molina) — freq</option><option value="q-holmes-elementary-watson">q-holmes-elementary-watson — Sherlock Holmes — Arthur Conan Doyle sto</option><option value="q-gandhi-be-the-change">q-gandhi-be-the-change — Mahatma Gandhi</option><option value="q-einstein-insanity">q-einstein-insanity — Albert Einstein</option><option value="q-uncle-ben-responsibility">q-uncle-ben-responsibility — Uncle Ben, as spoken advice to Peter Par</option><option value="q-feynman-fool-yourself">q-feynman-fool-yourself — Richard Feynman</option><option value="q-truzzi-extraordinary-claims">q-truzzi-extraordinary-claims — Carl Sagan (the 'Sagan standard')</option><option value="q-vonneumann-get-used">q-vonneumann-get-used — John von Neumann</option><option value="q-lovelace-engine-originate">q-lovelace-engine-originate — Ada Lovelace</option><option value="q-turing-short-distance">q-turing-short-distance — Alan Turing</option><option value="q-knuth-premature-optimization">q-knuth-premature-optimization — Donald Knuth</option><option value="q-gall-simple-system">q-gall-simple-system — John Gall</option><option value="q-dijkstra-testing">q-dijkstra-testing — Edsger Dijkstra</option><option value="q-asimov-knowledge-wisdom">q-asimov-knowledge-wisdom — Isaac Asimov</option><option value="q-meadows-listen">q-meadows-listen — Donella Meadows</option><option value="q-sun-tzu-deception">q-sun-tzu-deception — Sun Tzu</option><option value="q-arendt-banality-evil">q-arendt-banality-evil — Hannah Arendt</option><option value="q-hume-reason-slave">q-hume-reason-slave — David Hume</option><option value="q-butler-god-change">q-butler-god-change — Octavia E. Butler</option><option value="q-archimedes-lever">q-archimedes-lever — Archimedes of Syracuse</option><option value="q-brooks-silver-bullet">q-brooks-silver-bullet — Frederick P. Brooks Jr.</option><option value="q-blade-runner-tears-in-rain">q-blade-runner-tears-in-rain — Roy Batty (Rutger Hauer) — Blade Runner </option>
+            </select>
+          </div>
+        </div>
+
+        <div class="result-box" id="cite-output-box"></div>
+      </div>
+    </div>
+
+    <!-- Tab 3: Themes -->
+    <div id="tab-themes" class="tab-pane">
+      <div class="card">
+        <h2>Corpus Thematic Clusters</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-top: 16px;">
+          <div class="stat-pill" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px;">
+            <span style="color: #fff; font-size: 14px;">misattribution</span>
+            <span style="color: var(--accent); font-weight: bold;">5</span>
+          </div><div class="stat-pill" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px;">
+            <span style="color: #fff; font-size: 14px;">responsibility</span>
+            <span style="color: var(--accent); font-weight: bold;">2</span>
+          </div><div class="stat-pill" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px;">
+            <span style="color: #fff; font-size: 14px;">adaptation</span>
+            <span style="color: var(--accent); font-weight: bold;">2</span>
+          </div><div class="stat-pill" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px;">
+            <span style="color: #fff; font-size: 14px;">epistemics</span>
+            <span style="color: var(--accent); font-weight: bold;">2</span>
+          </div><div class="stat-pill" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px;">
+            <span style="color: #fff; font-size: 14px;">AI-history</span>
+            <span style="color: var(--accent); font-weight: bold;">2</span>
+          </div><div class="stat-pill" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px;">
+            <span style="color: #fff; font-size: 14px;">systems</span>
+            <span style="color: var(--accent); font-weight: bold;">2</span>
+          </div><div class="stat-pill" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px;">
+            <span style="color: #fff; font-size: 14px;">limits</span>
+            <span style="color: var(--accent); font-weight: bold;">2</span>
+          </div><div class="stat-pill" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px;">
+            <span style="color: #fff; font-size: 14px;">hubris</span>
+            <span style="color: var(--accent); font-weight: bold;">1</span>
+          </div><div class="stat-pill" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px;">
+            <span style="color: #fff; font-size: 14px;">irony</span>
+            <span style="color: var(--accent); font-weight: bold;">1</span>
+          </div><div class="stat-pill" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px;">
+            <span style="color: #fff; font-size: 14px;">canon-formation</span>
+            <span style="color: var(--accent); font-weight: bold;">1</span>
+          </div><div class="stat-pill" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px;">
+            <span style="color: #fff; font-size: 14px;">popular-culture</span>
+            <span style="color: var(--accent); font-weight: bold;">1</span>
+          </div><div class="stat-pill" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px;">
+            <span style="color: #fff; font-size: 14px;">paraphrase</span>
+            <span style="color: var(--accent); font-weight: bold;">1</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 4: Resonance -->
+    <div id="tab-resonance" class="tab-pane">
+      <div class="card">
+        <h2>Personal Resonance Protocol</h2>
+        <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 16px;">
+          The resonance layer (<code>resonance/</code>) captures personal and fleet logs of quotes that actually altered decisions in the field.
+        </p>
+        <div class="result-box">
+Format: JSON Lines (resonance/&lt;user&gt;.jsonl)
+Fields:
+- quote_id: references canonical q-* entry in corpus
+- date: YYYY-MM-DD
+- context: what was happening when the quote landed
+- why: why it carried load (decision altered, reframe forced)
+- impact: 1-5 scale (5 = changed operating model)
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 5: API Endpoints -->
+    <div id="tab-api" class="tab-pane">
+      <div class="card">
+        <h2>Machine-Readable CDN Schemas</h2>
+        <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 16px;">
+          Direct JSON feeds of the canonical quotes corpus with cryptographic verification:
+        </p>
+        <ul style="margin-left: 20px; font-family: var(--font-mono); font-size: 14px; line-height: 2;">
+          <li><a href="/api/data.json" target="_blank" style="color: var(--accent);">/api/data.json</a> &mdash; Master corpus &amp; metadata payload</li>
+          <li><a href="/api/quotes.json" target="_blank" style="color: var(--accent);">/api/quotes.json</a> &mdash; Raw JSON array of all 22 quotes</li>
+          <li><a href="/api/stats.json" target="_blank" style="color: var(--accent);">/api/stats.json</a> &mdash; Corpus statistics &amp; thematic distribution</li>
+        </ul>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      HUMMBL Canon &bull; Provenance-First Quotation Corpus &bull; <a href="https://hummbl.dev" style="color: var(--accent); text-decoration: none;">hummbl.dev</a>
+    </div>
+  </footer>
+
+  <script>
+    const QUOTES = [{"id": "q-otto-octavius-intelligence", "text": "Intelligence is not a gift, it's a privilege. You use it for the good of mankind.", "claimed_attribution": "Dr. Otto Octavius (Alfred Molina) \u2014 frequently misattributed online to the Ancient One in Doctor Strange", "verified_attribution": "Dr. Otto Octavius \u2014 Spider-Man 2 (2004), spoken to Peter Parker before the fusion reactor demonstration", "source": {"type": "film", "work": "Spider-Man 2 (2004), dir. Sam Raimi", "locator": "Octavius's apartment/lab scene, before the fusion experiment"}, "context": "Delivered as Octavius's stated ethos moments before hubris runs the experiment anyway \u2014 the line lands because he fails his own test.", "themes": ["responsibility", "hubris", "irony"], "hummbl": ["IN", "P"], "provenance": "VERIFIED", "receipts": [{"type": "primary", "ref": "Spider-Man 2 (2004) film, Octavius-Parker dialogue scene"}, {"type": "script", "ref": "Alvin Sargent screenplay, Spider-Man 2"}], "opinion": {"class": "AXIOLOGICAL", "holder": "agy", "loss_function": "Ethical responsibility * Hubris tragedy * Vernacular transfer", "intensity": 0.88, "update_triggers": ["Empirical evidence that ethical restraint phrasing diminishes narrative impact in technical governance contexts."]}}, {"id": "q-holmes-elementary-watson", "text": "Elementary, my dear Watson.", "claimed_attribution": "Sherlock Holmes \u2014 Arthur Conan Doyle stories", "verified_attribution": "Never appears verbatim in the Doyle canon; closest is 'Elementary,' said he, in 'The Adventure of the Crooked Man' (1893), with 'my dear Watson' used separately elsewhere. An early exact phrasing appears in P. G. Wodehouse's Psmith, Journalist (1915).", "source": {"type": "other", "work": "Misquotation history", "locator": "Doyle canon: 'The Crooked Man' (1893); Wodehouse: Psmith, Journalist (1915)"}, "context": "The most famous line in detective fiction was never written by its author \u2014 the canonical example of a quotation becoming true through repetition.", "themes": ["misattribution", "canon-formation", "popular-culture"], "hummbl": ["IN", "P"], "provenance": "MISATTRIBUTED", "receipts": [{"type": "quote-investigator", "ref": "quoteinvestigator.com 'Elementary, My Dear Watson' entry"}, {"type": "primary", "ref": "Conan Doyle, 'The Adventure of the Crooked Man' (1893)"}]}, {"id": "q-gandhi-be-the-change", "text": "Be the change you wish to see in the world.", "claimed_attribution": "Mahatma Gandhi", "verified_attribution": "No documented instance in Gandhi's writings or speeches; closest verified passage is a 1913 Indian Opinion article: 'If we could change ourselves, the tendencies in the world would also change.'", "source": {"type": "article", "work": "Indian Opinion (1913)", "locator": "Gandhi's 'Snake' article passage, per Quote Investigator"}, "context": "The aphorism is a faithful compression of Gandhi's position but not his words \u2014 a paraphrase that ate its source.", "themes": ["misattribution", "paraphrase", "leadership"], "hummbl": ["IN", "P"], "provenance": "MISATTRIBUTED", "receipts": [{"type": "quote-investigator", "ref": "quoteinvestigator.com 'Be the change' entry"}]}, {"id": "q-einstein-insanity", "text": "Insanity is doing the same thing over and over again and expecting different results.", "claimed_attribution": "Albert Einstein", "verified_attribution": "Earliest documented appearance is a 1981 Narcotics Anonymous pamphlet: 'Insanity is repeating the same mistakes and expecting different results.' No Einstein connection has ever been found.", "source": {"type": "book", "work": "Narcotics Anonymous pamphlet (1981)", "locator": "per Quote Investigator, earliest known print citation"}, "context": "Assigned to Einstein by repetition \u2014 the aphorism's real lesson is about the attribution system, not the physics.", "themes": ["misattribution", "repetition", "recovery-literature"], "hummbl": ["IN", "P"], "provenance": "MISATTRIBUTED", "receipts": [{"type": "quote-investigator", "ref": "quoteinvestigator.com 'Insanity' entry"}]}, {"id": "q-uncle-ben-responsibility", "text": "With great power there must also come \u2014 great responsibility!", "claimed_attribution": "Uncle Ben, as spoken advice to Peter Parker", "verified_attribution": "Stan Lee's narration caption, Amazing Fantasy #15 (1962) \u2014 the line appears as a closing narrator caption, not as dialogue from Uncle Ben; later film adaptations moved it into Ben's mouth.", "source": {"type": "book", "work": "Amazing Fantasy #15 (Marvel, 1962)", "locator": "final-page narration caption"}, "context": "The most quoted line in superhero fiction is a narrator's caption that two generations of adaptation converted into a dying man's advice.", "themes": ["misattribution", "adaptation", "responsibility"], "hummbl": ["IN", "P"], "provenance": "MISATTRIBUTED", "receipts": [{"type": "primary", "ref": "Amazing Fantasy #15 (1962), final panel narration"}]}, {"id": "q-feynman-fool-yourself", "text": "The first principle is that you must not fool yourself \u2014 and you are the easiest person to fool.", "claimed_attribution": "Richard Feynman", "verified_attribution": "Richard Feynman, 'Cargo Cult Science' \u2014 Caltech commencement address, 1974", "source": {"type": "speech", "work": "Cargo Cult Science, Caltech commencement (1974)", "locator": "closing section"}, "context": "The closing instruction of a lecture on scientific integrity \u2014 self-deception named as the researcher-by-default failure mode.", "themes": ["epistemics", "integrity", "self-deception"], "hummbl": ["IN", "P"], "provenance": "VERIFIED", "receipts": [{"type": "primary", "ref": "Feynman, 'Cargo Cult Science' (1974); reprinted in 'Surely You're Joking, Mr. Feynman!'"}]}, {"id": "q-truzzi-extraordinary-claims", "text": "Extraordinary claims require extraordinary evidence.", "claimed_attribution": "Carl Sagan (the 'Sagan standard')", "verified_attribution": "Marcello Truzzi, 'On the Extraordinary: An Attempt at Clarification,' Zetetic Scholar vol.1 no.1 (1978): 'an extraordinary claim requires extraordinary proof.' Sagan popularized but did not originate it.", "source": {"type": "paper", "work": "Zetetic Scholar 1(1), 1978", "locator": "Truzzi's editorial essay"}, "context": "The slogan of scientific skepticism was coined by the skeptic Sagan borrowed it from \u2014 a misattribution about epistemic standards itself.", "themes": ["misattribution", "epistemics", "skepticism"], "hummbl": ["IN", "P"], "provenance": "MISATTRIBUTED", "receipts": [{"type": "primary", "ref": "Truzzi, Zetetic Scholar 1(1) 1978, p.11"}, {"type": "quote-investigator", "ref": "quoteinvestigator.com 'Extraordinary claims' entry"}]}, {"id": "q-vonneumann-get-used", "text": "Young man, in mathematics you don't understand things. You just get used to them.", "claimed_attribution": "John von Neumann", "verified_attribution": "John von Neumann, as recounted by Felix Smith in reply to a questioner; transmitted via Gary Zukav's 'The Dancing Wu Li Masters' (1979) \u2014 documented secondhand, not verbatim-published.", "source": {"type": "book", "work": "Gary Zukav, The Dancing Wu Li Masters (1979)", "locator": "Felix Smith anecdote"}, "context": "The anti-romantic account of mathematical fluency \u2014 comprehension as habituation, which doubles as a theory of how models internalize structure.", "themes": ["mathematics", "learning", "habituation"], "hummbl": ["P", "RE"], "provenance": "COMMON-ATTRIB", "receipts": [{"type": "secondary", "ref": "Zukav (1979), quoting Felix Smith's account"}]}, {"id": "q-lovelace-engine-originate", "text": "The Analytical Engine has no pretensions whatever to originate anything.", "claimed_attribution": "Ada Lovelace", "verified_attribution": "Ada Lovelace, Note G to her translation of Menabrea's 'Sketch of the Analytical Engine' (1843)", "source": {"type": "paper", "work": "Lovelace, Notes to Sketch of the Analytical Engine (1843)", "locator": "Note G"}, "context": "The first published statement of the 'can machines originate' question \u2014 Turing's Lady Lovelace's Objection in Computing Machinery and Intelligence answers her a century later.", "themes": ["computation", "origination", "AI-history"], "hummbl": ["P", "IN"], "provenance": "VERIFIED", "receipts": [{"type": "primary", "ref": "Lovelace, Note G (1843); cited by Turing (1950)"}]}, {"id": "q-turing-short-distance", "text": "We can only see a short distance ahead, but we can see plenty there that needs to be done.", "claimed_attribution": "Alan Turing", "verified_attribution": "Alan Turing, 'Computing Machinery and Intelligence,' Mind 59 (1950), final paragraph", "source": {"type": "paper", "work": "Mind 59 (1950)", "locator": "\u00a77, closing lines"}, "context": "The close of the imitation-game paper \u2014 an agenda set by someone who knew the horizon was occluded, the founding humility of the field.", "themes": ["AI-history", "humility", "agenda"], "hummbl": ["P", "RE"], "provenance": "VERIFIED", "receipts": [{"type": "primary", "ref": "Turing, Mind 59 (1950) 433-460"}]}, {"id": "q-knuth-premature-optimization", "text": "We should forget about small efficiencies, say about 97% of the time: premature optimization is the root of all evil.", "claimed_attribution": "Donald Knuth", "verified_attribution": "Donald Knuth, 'Structured Programming with go to Statements,' ACM Computing Surveys 6(4) 1974", "source": {"type": "paper", "work": "ACM Computing Surveys 6(4), December 1974", "locator": "p. 268"}, "context": "Quoted half as often as it is violated \u2014 and usually quoted without the 97% hedge that makes it a calibrated claim rather than a dogma.", "themes": ["optimization", "engineering", "calibration"], "hummbl": ["DE", "IN"], "provenance": "VERIFIED", "receipts": [{"type": "primary", "ref": "Knuth, ACM Computing Surveys 6(4) 1974, p.268"}]}, {"id": "q-gall-simple-system", "text": "A complex system that works is invariably found to have evolved from a simple system that worked.", "claimed_attribution": "John Gall", "verified_attribution": "John Gall, Systemantics: How Systems Work and Especially How They Fail (1975) \u2014 'Gall's Law'", "source": {"type": "book", "work": "Systemantics (1975)", "locator": "Gall's Law"}, "context": "The empirical inverse of top-down design: working complexity is grown, not drawn \u2014 the design principle that explains why rewrites fail.", "themes": ["systems", "evolution", "design"], "hummbl": ["RE", "SY", "DE"], "provenance": "VERIFIED", "receipts": [{"type": "primary", "ref": "Gall, Systemantics (1975)"}]}, {"id": "q-dijkstra-testing", "text": "Program testing can be used to show the presence of bugs, but never to show their absence!", "claimed_attribution": "Edsger Dijkstra", "verified_attribution": "Edsger W. Dijkstra, 'Notes on Structured Programming' (EWD249, 1970; also printed in the 1972 book of the same name)", "source": {"type": "paper", "work": "EWD249 / Notes on Structured Programming (1970/1972)", "locator": "testing section"}, "context": "The single most cited sentence in software correctness \u2014 still true, still quoted to justify the very testing regimes it critiques.", "themes": ["correctness", "testing", "limits"], "hummbl": ["IN", "DE"], "provenance": "VERIFIED", "receipts": [{"type": "primary", "ref": "Dijkstra, EWD249 (1970)"}]}, {"id": "q-asimov-knowledge-wisdom", "text": "The saddest aspect of life right now is that science gathers knowledge faster than society gathers wisdom.", "claimed_attribution": "Isaac Asimov", "verified_attribution": "Isaac Asimov \u2014 appears in Isaac Asimov's Book of Science and Nature Quotations (1988), compiled by Asimov and Jason Shulman", "source": {"type": "book", "work": "Isaac Asimov's Book of Science and Nature Quotations (1988)", "locator": "attributed aphorism"}, "context": "The governance-lag thesis in one line \u2014 knowledge accrues faster than the institutions that must absorb it, which is a structural statement not a complaint.", "themes": ["wisdom", "governance-lag", "progress"], "hummbl": ["P", "SY"], "provenance": "VERIFIED", "receipts": [{"type": "primary", "ref": "Asimov & Shulman, Book of Science and Nature Quotations (1988)"}]}, {"id": "q-meadows-listen", "text": "We can't impose our will on a system. We can listen to what the system tells us, and discover how its properties and our values can work together to bring forth something much better than could ever be produced by our will alone.", "claimed_attribution": "Donella Meadows", "verified_attribution": "Donella H. Meadows, Thinking in Systems: A Primer (2008), the 'Dancing with Systems' chapter", "source": {"type": "book", "work": "Thinking in Systems (2008)", "locator": "Part Seven / 'Dancing with Systems'"}, "context": "The closing instruction of the systems-thinking canon \u2014 control fails, listening works; the theoretical root of every 'read state before acting' protocol.", "themes": ["systems", "control", "attention"], "hummbl": ["SY", "P", "RE"], "provenance": "VERIFIED", "receipts": [{"type": "primary", "ref": "Meadows, Thinking in Systems (2008), final chapter"}]}, {"id": "q-sun-tzu-deception", "text": "All warfare is based on deception.", "claimed_attribution": "Sun Tzu", "verified_attribution": "Sun Tzu, The Art of War, chapter 1 'Laying Plans' \u00a718-19 (Lionel Giles translation, 1910)", "source": {"type": "book", "work": "The Art of War (ca. 5th c. BCE; Giles trans. 1910)", "locator": "ch. 1, \u00a718"}, "context": "The opening strategic axiom \u2014 indirection as the normal condition of conflict, not the exception.", "themes": ["strategy", "deception", "conflict"], "hummbl": ["IN", "P"], "provenance": "VERIFIED", "receipts": [{"type": "primary", "ref": "Sun Tzu, Art of War ch.1 \u00a718 (Giles 1910)"}]}, {"id": "q-arendt-banality-evil", "text": "...the fearsome, word-and-thought-defying banality of evil.", "claimed_attribution": "Hannah Arendt", "verified_attribution": "Hannah Arendt, Eichmann in Jerusalem: A Report on the Banality of Evil (1963), closing pages", "source": {"type": "book", "work": "Eichmann in Jerusalem (1963)", "locator": "epilogue, final paragraph"}, "context": "The phrase that outgrew its book \u2014 evil as thoughtlessness and bureaucratic normality rather than demonic intention, written at the edge of what language could hold.", "themes": ["evil", "bureaucracy", "thoughtlessness"], "hummbl": ["P", "IN"], "provenance": "VERIFIED", "receipts": [{"type": "primary", "ref": "Arendt, Eichmann in Jerusalem (1963)"}]}, {"id": "q-hume-reason-slave", "text": "Reason is, and ought only to be the slave of the passions, and can never pretend to any other office than to serve and obey them.", "claimed_attribution": "David Hume", "verified_attribution": "David Hume, A Treatise of Human Nature (1739), Book 2, Part 3, \u00a73", "source": {"type": "book", "work": "A Treatise of Human Nature (1739)", "locator": "2.3.3"}, "context": "The claim that motivation precedes and governs reasoning \u2014 the 1739 version of motivated reasoning, still the sharpest single line on the subject.", "themes": ["reason", "motivation", "sentiment"], "hummbl": ["IN", "P"], "provenance": "VERIFIED", "receipts": [{"type": "primary", "ref": "Hume, Treatise 2.3.3 (1739)"}]}, {"id": "q-butler-god-change", "text": "God is Change.", "claimed_attribution": "Octavia E. Butler", "verified_attribution": "Octavia E. Butler, Parable of the Sower (1993) \u2014 the central verse of Lauren Olamina's Earthseed", "source": {"type": "book", "work": "Parable of the Sower (1993)", "locator": "Earthseed verses, recurring"}, "context": "The theological core of the Earthseed books \u2014 change as the only persistent power, and therefore the thing to be shaped rather than escaped.", "themes": ["change", "adaptation", "theology"], "hummbl": ["SY", "RE", "P"], "provenance": "VERIFIED", "receipts": [{"type": "primary", "ref": "Butler, Parable of the Sower (1993)"}]}, {"id": "q-archimedes-lever", "text": "Give me a place to stand, and I shall move the earth.", "claimed_attribution": "Archimedes of Syracuse", "verified_attribution": "Attributed to Archimedes by Pappus of Alexandria, Synagoge VIII (~340 CE) \u2014 ancient secondhand transmission, no surviving Archimedes text contains it.", "source": {"type": "book", "work": "Pappus, Synagoge (Collection), Book VIII", "locator": "on the lever"}, "context": "The founding metaphor of leverage \u2014 and a good example of the corpus's middle tier: probably real, transmitted through a later author, not checkable to a primary text.", "themes": ["leverage", "mechanics", "antiquity"], "hummbl": ["DE", "SY"], "provenance": "COMMON-ATTRIB", "receipts": [{"type": "secondary", "ref": "Pappus, Synagoge VIII (~340 CE)"}]}, {"id": "q-brooks-silver-bullet", "text": "There is no single development, in either technology or management technique, which by itself promises even one order-of-magnitude improvement within a decade in productivity, in reliability, in simplicity.", "claimed_attribution": "Frederick P. Brooks Jr.", "verified_attribution": "Frederick P. Brooks Jr., 'No Silver Bullet \u2014 Essence and Accidents of Software Engineering,' IEEE Computer 20(4) 1987 (1986 IFIP keynote)", "source": {"type": "paper", "work": "IEEE Computer 20(4), April 1987", "locator": "opening thesis"}, "context": "The discipline-defining claim that software's hard part is essence not accident \u2014 the quote the industry cites every time it reaches for a silver bullet anyway.", "themes": ["software", "essence-vs-accident", "limits"], "hummbl": ["DE", "IN"], "provenance": "VERIFIED", "receipts": [{"type": "primary", "ref": "Brooks, 'No Silver Bullet,' IEEE Computer 20(4) 1987"}]}, {"id": "q-blade-runner-tears-in-rain", "text": "All those moments will be lost in time, like tears in rain. Time to die.", "claimed_attribution": "Roy Batty (Rutger Hauer) \u2014 Blade Runner (1982)", "verified_attribution": "Roy Batty (played by Rutger Hauer, who improvised/condensed David Peoples' script draft during filming) \u2014 Blade Runner (1982), dir. Ridley Scott", "source": {"type": "film", "work": "Blade Runner (1982), dir. Ridley Scott", "locator": "climax rooftop scene, monologue to Rick Deckard"}, "context": "The apex cinematic meditation on synthetic consciousness, mortality, and ephemeral memory \u2014 Batty saves the human hunting him and peacefully accepts his four-year lifespan expiration.", "themes": ["synthetic-consciousness", "mortality", "memory", "transcendence"], "hummbl": ["SY", "P", "IN"], "provenance": "VERIFIED", "receipts": [{"type": "primary", "ref": "Blade Runner (1982) final cut dialogue"}, {"type": "interview", "ref": "Rutger Hauer autobiography 'All Those Moments' (2007) recounting rewriting Hampton Fancher & David Peoples script on set"}], "opinion": {"class": "AESTHETIC", "holder": "agy", "loss_function": "Synthetic existential resonance * Improvised economy of language * Somatic pathos", "intensity": 0.98, "update_triggers": ["Discovery of pre-production script drafts proving verbatim phrasing prior to Hauer's on-set improvisation.", "Consensus shift in AI philosophy determining synthetic agent mortality narratives lack philosophical relevance."]}}];
+    let currentProvFilter = 'ALL';
+
+    function openTab(evt, tabName) {
+      const panes = document.getElementsByClassName("tab-pane");
+      for (let i = 0; i < panes.length; i++) panes[i].classList.remove("active");
+      const btns = document.getElementsByClassName("tab-btn");
+      for (let i = 0; i < btns.length; i++) btns[i].classList.remove("active");
+      document.getElementById(tabName).classList.add("active");
+      evt.currentTarget.classList.add("active");
+    }
+
+    function setProvenanceFilter(filter, evt) {
+      currentProvFilter = filter;
+      const btns = document.querySelectorAll(".filter-bar .filter-btn");
+      btns.forEach(b => b.classList.remove("active"));
+      evt.target.classList.add("active");
+      filterQuotes();
+    }
+
+    function filterQuotes() {
+      const query = document.getElementById("quote-search").value.toLowerCase();
+      const container = document.getElementById("quotes-container");
+      container.innerHTML = "";
+
+      const filtered = QUOTES.filter(q => {
+        const matchesProv = (currentProvFilter === 'ALL' || q.provenance === currentProvFilter);
+        const text = (q.text + " " + q.claimed_attribution + " " + q.verified_attribution + " " + (q.themes || []).join(" ")).toLowerCase();
+        const matchesQuery = !query || text.includes(query);
+        return matchesProv && matchesQuery;
+      });
+
+      filtered.forEach(q => {
+        let provClass = "prov-verified";
+        if (q.provenance === "MISATTRIBUTED") provClass = "prov-misattributed";
+        if (q.provenance === "COMMON-ATTRIB") provClass = "prov-common";
+
+        const card = document.createElement("div");
+        card.className = "quote-card";
+        card.innerHTML = `
+          <div class="quote-header">
+            <span class="quote-id">${q.id}</span>
+            <span class="prov-badge ${provClass}">${q.provenance}</span>
+          </div>
+          <p class="quote-text">"${q.text}"</p>
+          <div class="attrib-block">
+            <div>
+              <div class="attrib-label">Claimed Attribution (Internet)</div>
+              <div>${q.claimed_attribution}</div>
+            </div>
+            <div>
+              <div class="attrib-label" style="color: var(--accent);">Verified Attribution (Evidence)</div>
+              <div>${q.verified_attribution}</div>
+            </div>
+          </div>
+          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 8px;"><strong>Context:</strong> ${q.context || 'N/A'}</p>
+          <div class="tag-list">
+            ${(q.themes || []).map(t => `<span class="tag">#${t}</span>`).join("")}
+            ${(q.hummbl || []).map(h => `<span class="tag" style="color: var(--accent);">Base120:${h}</span>`).join("")}
+          </div>
+          ${q.receipts && q.receipts.length ? `
+            <div class="receipts-box">
+              <strong>Receipts:</strong> ${q.receipts.map(r => `[${r.type}] ${r.ref}`).join(" &bull; ")}
+            </div>
+          ` : ''}
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function generateCitation() {
+      const id = document.getElementById("cite-select").value;
+      const q = QUOTES.find(item => item.id === id);
+      if (!q) return;
+
+      const output = `### Markdown AAR Citation:
+> "${q.text}"
+> &mdash; **${q.verified_attribution}** [Anchor: `${q.id}` | Provenance: ${q.provenance}]
+
+### Bus Status Short Form:
+host=anvil [citation=${q.id}] "${q.text}" &mdash; ${q.verified_attribution}
+
+### JSON Reference Object:
+${JSON.stringify({
+  "anchor_id": q.id,
+  "quote": q.text,
+  "verified_attribution": q.verified_attribution,
+  "provenance": q.provenance,
+  "receipts": q.receipts
+}, null, 2)}`;
+
+      document.getElementById("cite-output-box").innerText = output;
+    }
+
+    // Initial render
+    filterQuotes();
+    generateCitation();
+  </script>
+</body>
+</html>

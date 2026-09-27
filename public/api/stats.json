@@ -1,0 +1,23 @@
+{
+  "total_quotes": 22,
+  "provenance": {
+    "VERIFIED": 15,
+    "MISATTRIBUTED": 5,
+    "COMMON-ATTRIB": 2
+  },
+  "top_themes": {
+    "misattribution": 5,
+    "responsibility": 2,
+    "adaptation": 2,
+    "epistemics": 2,
+    "AI-history": 2,
+    "systems": 2,
+    "limits": 2,
+    "hubris": 1,
+    "irony": 1,
+    "canon-formation": 1,
+    "popular-culture": 1,
+    "paraphrase": 1
+  },
+  "opinions_count": 2
+}
